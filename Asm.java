@@ -24,8 +24,8 @@ public class Asm
 
 	private static final int DEFAULT_SIZE = 256;
 
-	private int[][] memory;
-	private int[][] before;
+	private int[] memory;
+	private int[] before;
 	private int size;
 	private Queue<String> warningQueue;
 
@@ -52,14 +52,14 @@ public class Asm
 	public Asm(int size)
 	{
 		this.size = size;
-		memory = new int[size][1]; // size x 1 byte
-		before = new int[size][1]; // size x 1 byte
+		memory = new int[size]; // size x 1 byte
+		before = new int[size]; // size x 1 byte
 
 		// Fill the memory with zeros
 		for (int i = 0; i<size; i++)
 		{
-			memory[i][0] = 0;
-			before[i][0] = 0;
+			memory[i] = 0;
+			before[i] = 0;
 		}
 
 		warningQueue = new LinkedList<String>(); // Initialize warning queue
@@ -71,24 +71,6 @@ public class Asm
 	public Asm()
 	{
 		this(DEFAULT_SIZE);
-	}
-
-	/**
-	* Performs a deep copy of the 2D array to lose the reference relationship
-	*
-	* @param input the array to be coppied
-	* @return a deep copy of the 2D matrix
-	*/
-	public static int[][] deepCopyIntMatrix(int[][] input)
-	{
-	    if (input == null) return null;
-
-	    int[][] result = new int[input.length][];
-
-	    for (int i = 0; i<input.length; i++)
-	        result[i] = input[i].clone();
-
-	    return result;
 	}
 
 	/**
@@ -137,7 +119,7 @@ public class Asm
 							warning("Attempting to insert instruction larger than 2 bytes 0x" + HEX(tmp) + "\n\t Default behaviour: truncate 0x" + HEX(inst));
 						}
 
-						memory[addr][0] = inst;
+						memory[addr] = inst;
 					}
 					else
 						warning("Attempting to insert instruction at address 0x" + HEX(addr) + ". Max address is 0x" + HEX(size-1) + ". Check the instruction code.");
@@ -179,18 +161,18 @@ public class Asm
 	public void execute(String filename)
 	{
 		loadToMemory(filename); // load instructions to the memory matrix
-		before = deepCopyIntMatrix(memory); // save the initial state of the memory
+		before = memory.clone(); // save the initial state of the memory
 
 		int AC = 0; // set the Acumulator Register to 0
 
 		for (int i=0; i<size; i++)
 		{
-			int inst = memory[i][0]; // fetch instruction
+			int inst = memory[i]; // fetch instruction
 			String hex = intToHex(inst); // hexadecimal representation of the instruction
 
 
-			int direct = i<size - 1 ? memory[i + 1][0] : 0;
-			int indirect = direct<size-1 ? memory[direct][0] : 0;
+			int direct = i<size - 1 ? memory[i + 1] : 0;
+			int indirect = direct<size-1 ? memory[direct] : 0;
 
 			String[] dir = {"1", "2", "3", "4", "8", "10", "20"};
 			String[] line = {"41", "42", "44", "48", "50", "60"};
@@ -198,37 +180,37 @@ public class Asm
 			boolean isDirect = hex.equals("1") || hex.equals("2") || hex.equals("3") || hex.equals("4") || hex.equals("8") || hex.equals("10") || hex.equals("20");
 			int ref = isDirect ? direct : indirect;
 
-			String hex2 = direct<size - 2 ? intToHex(memory[i + 2][0]) : "0";
+			String hex2 = direct<size - 2 ? intToHex(memory[i + 2]) : "0";
 			boolean oneLine =  hex2.equals("41") || hex2.equals("42") || hex2.equals("44") || hex2.equals("48") || hex2.equals("50") || hex2.equals("60");
 
 			switch (hex)
 			{
 				case "1": //AND
 				case "81": //AND indirect
-					AC = and(AC, memory[ref][0]);
+					AC = and(AC, memory[ref]);
 					i++;
-					print("AC AND " + HEX(memory[ref][0]) + " = " + AC, RED);
+					print("AC AND " + HEX(memory[ref]) + " = " + AC, RED);
 				break;
 
 				case "2": //ADD
 				case "82": //ADD indirect
-					AC += memory[ref][0];
+					AC += memory[ref];
 					AC = truncate(AC);
 					i++;
-					print("AC+=" + HEX(memory[ref][0]), RED);
+					print("AC+=" + HEX(memory[ref]), RED);
 				break;
 
 				case "3": //SUB
 				case "83": //SUB indirect
-					AC -= memory[ref][0];
+					AC -= memory[ref];
 					AC = truncate(AC);
 					i++;
-					print("AC-=" + HEX(memory[ref][0]), RED);
+					print("AC-=" + HEX(memory[ref]), RED);
 				break;
 
 				case "4": //LDA
 				case "84": //LDA indirect
-					AC = memory[ref][0];
+					AC = memory[ref];
 					i++; // skip address
 
 					print("AC=" + HEX(AC), RED);
@@ -236,7 +218,7 @@ public class Asm
 
 				case "8": //STA
 				case "88": //STA indirect
-					memory[ref][0] = AC;
+					memory[ref] = AC;
 					i++; // skip address
 
 					print("M["+HEX(ref)+"]<-" + HEX(AC), YELLOW);
@@ -251,12 +233,12 @@ public class Asm
 
 				case "20": //ISZ
 				case "A0": //ISZ indirect
-					memory[ref][0] = truncate(memory[ref][0] + 1);
+					memory[ref] = truncate(memory[ref] + 1);
 					i++;
 
-					print("  ISZ - " + "M[" + HEX(ref) + "]: " + HEX(memory[ref][0]), WHITE);
+					print("  ISZ - " + "M[" + HEX(ref) + "]: " + HEX(memory[ref]), WHITE);
 
-					if (memory[ref][0]==0)
+					if (memory[ref]==0)
 					{
 						print("SKIP", WHITE);
 						i += (oneLine ? 1 : 2);
@@ -391,8 +373,8 @@ public class Asm
 			for (int i = 0; i<size; i++)
 			{
 				int addr = i;
-				int inst = memory[i][0];
-				int instp = before[i][0];
+				int inst = memory[i];
+				int instp = before[i];
 
 				if (!(inst==0 && instp==0))
 				{
