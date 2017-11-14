@@ -25,7 +25,7 @@ public class Asm
 
 
 	public static final boolean COLOR_OUTPUT = true;
-	public static final boolean SHOWSTEPS = true;
+	public static final boolean SHOW_STEPS = true;
 	public static final boolean WARNINGS = true;
 
 	private static final int DEFAULT_SIZE = 256;
@@ -34,6 +34,7 @@ public class Asm
 	private int[] before;
 	private int size;
 	private Queue<String> warningQueue;
+  private Queue<String> steps;
 
 	//Class methods *****************************************************
   /**
@@ -69,6 +70,7 @@ public class Asm
 		}
 
 		warningQueue = new LinkedList<String>(); // Initialize warning queue
+    steps = new LinkedList<String>();
 	}
 
 	/**
@@ -157,6 +159,13 @@ public class Asm
 
 		while (!warningQueue.isEmpty() && WARNINGS)
 			System.out.println(col("Warning: " + warningQueue.remove(), YELLOW));
+	}
+
+  /**
+	*/
+	public void showSteps(){
+		while (!steps.isEmpty())
+			System.out.println(col(steps.remove(), YELLOW));
 	}
 
 	/**
@@ -356,7 +365,7 @@ public class Asm
 
 	/**
 	* Prints a string that represents the steps of execution of memory instructions.
-	* SHOWSTEPS can be set to false to stop diplaying steps.
+	* SHOW_STEPS can be set to false to stop diplaying steps.
 	*
 	* @param command command currently executed
 	* @param color color of the command
@@ -364,7 +373,7 @@ public class Asm
 	*/
 	public void print(String command, int color)
 	{
-		if (SHOWSTEPS)
+		if (SHOW_STEPS)
 			System.out.println(col(command, color));
 	}
 
@@ -418,9 +427,9 @@ public class Asm
         if (i % 16 == 0)
           line+="\n" + col(HEX(i), 104) + "   ";
 
-        int color = (i == addr ? 101 : RED);
+        int color = (i == addr ? 5 : 91);
         color = (i==delta_cell) ? BRIGHT_GREEN : color;
-        line += col(HEX(mem[i]), mem[i]!=0 ? color : WHITE) + "  ";
+        line += col(HEX(mem[i]), mem[i]!=0 ? color : 37) + "  ";
 			}
 
       System.out.println(line);
@@ -437,6 +446,7 @@ public class Asm
     before = memory.clone(); // save the initial state of the memory
 
     int AC = 0; // set the Acumulator Register to 0
+    int iteration = 0;
 
     for (int i=0; i<size; i++)
     {
@@ -466,7 +476,7 @@ public class Asm
         case "81": //AND indirect
           AC = and(AC, memory[ref]);
           i++;
-          print("AC AND " + HEX(memory[ref]) + " = " + AC, RED);
+          steps.add("AC AND " + HEX(memory[ref]) + " = " + AC);
         break;
 
         case "2": //ADD
@@ -474,7 +484,7 @@ public class Asm
           AC += memory[ref];
           AC = truncate(AC);
           i++;
-          print("AC+=" + HEX(memory[ref]), RED);
+          steps.add("AC+=" + HEX(memory[ref]));
         break;
 
         case "3": //SUB
@@ -482,7 +492,7 @@ public class Asm
           AC -= memory[ref];
           AC = truncate(AC);
           i++;
-          print("AC-=" + HEX(memory[ref]), RED);
+          steps.add("AC-=" + HEX(memory[ref]));
         break;
 
         case "4": //LDA
@@ -490,7 +500,7 @@ public class Asm
           AC = memory[ref];
           i++; // skip address
 
-          print("AC=" + HEX(AC), RED);
+          steps.add("AC=" + HEX(AC));
         break;
 
         case "8": //STA
@@ -499,14 +509,14 @@ public class Asm
           i++; // skip address
           delta_cell = ref;
 
-          print("M["+HEX(ref)+"]<-" + HEX(AC), YELLOW);
+          steps.add("M["+HEX(ref)+"]<-" + HEX(AC));
         break;
 
         case "10": //BUN
         case "90": //BUN indirect
           i = (isDirect ? direct : indirect) - 1;
 
-          print("  BUN to: " + HEX(i + 1), WHITE);
+          steps.add("  BUN to: " + HEX(i + 1));
         break;
 
         case "20": //ISZ
@@ -514,11 +524,11 @@ public class Asm
           memory[ref] = truncate(memory[ref] + 1);
           i++;
 
-          print("  ISZ - " + "M[" + HEX(ref) + "]: " + HEX(memory[ref]), WHITE);
+          steps.add("  ISZ - " + "M[" + HEX(ref) + "]: " + HEX(memory[ref]));
 
           if (memory[ref]==0)
           {
-            print("SKIP", WHITE);
+            steps.add("SKIP");
             i += (oneLine ? 1 : 2);
           }
         break;
@@ -526,31 +536,31 @@ public class Asm
 
         case "41": //CLA
           AC = 0;
-          print("AC=0", RED);
+          steps.add("AC=0");
         break;
 
         case "42": //CMA
           AC = complement(AC);
-          print("(AC)'=" + HEX(AC), YELLOW);
+          steps.add("(AC)'=" + HEX(AC));
         break;
 
         case "44": //ASL
           AC = asl(AC);
-          print("AC asl -> " + HEX(AC), YELLOW);
+          steps.add("AC asl -> " + HEX(AC));
         break;
 
         case "48": //ASR
           AC = asr(AC);
-          print("AC asr -> " + HEX(AC), YELLOW);
+          steps.add("AC asr -> " + HEX(AC));
         break;
 
         case "50": //INC
           AC++;
-          print("AC++", BLUE);
+          steps.add("AC++");
         break;
 
         case "60": //HLT
-          print("HALT", RED);
+          steps.add("HALT");
           return ;
 
         default:
@@ -559,20 +569,25 @@ public class Asm
       }
 
       clear();
+      System.out.println("Iteration = " + iteration);
+      System.out.println("Command = ");
       System.out.println("PC = " + HEX(bfr));
       System.out.println("AC = " + HEX(AC));
       System.out.println();
       print2dMemory(memory, bfr, delta_cell);
-      pressAnyKeyToContinue();
+      pressAnyKeyToContinue("Press Enter key to continue...");
+      iteration++;
     }
   }
 
   /**
   * Waits for user to press a key before continuing
+  *
+  * @param msg
   */
-  private void pressAnyKeyToContinue()
+  private void pressAnyKeyToContinue(String msg)
   {
-      System.out.println("Press Enter key to continue...");
+      System.out.println(msg);
       try{
          System.in.read();
       }
@@ -691,71 +706,22 @@ public class Asm
 		return Integer.parseInt(result, 2);
 	}
 
+  public void printColorTable()
+  {
+    String line = "";
+    for (int i=0; i<400; i++)
+    {
+      if (i%20 ==0)
+        line+="\n";
 
-	/**
-	* Instantiates a class to load and execute machine code.
-	*
-	* @param args [0] is the name of the file with the machine instructions.
-	*/
-	public static void main(String[] args)
-	{
-		if (args.length<1)
-		{
-			System.out.println("Please specify a file to load the machine code from.");
-			return ;
-		}
+      line+= col(format(i), i) + "  ";
+    }
 
-		Asm machine = new Asm();
+    System.out.println(line);
+  }
 
-		System.out.println(col("START", GREEN));
-	  //machine.execute(args[0]);
-		System.out.println();
-
-		//machine.printNonEmptyDiff();
-
-		System.out.println();
-
-		machine.showWarnings();
-    machine.executeStepwise(args[0]);
-
-		//test(machine);
-	}
-
-
-	/**
-	* Method that performs tests on the machine.
-	*
-	* @param machine
-	*/
-	public static void test(Asm machine)
-	{
-		System.out.println();
-		System.out.println();
-
-		System.out.println(Integer.toBinaryString(30));
-	  System.out.println(Integer.toBinaryString(23));
-
-		System.out.println();
-
-		System.out.println(machine.complement(30));
-		System.out.println(machine.complement(23));
-
-		System.out.println();
-
-		System.out.println(machine.and(30, 23));
-
-		int[] num = {0x21, 0xB5, 0x37, 0x08, 0x5C, 0x84, 0xA1, 0x1D, 0x72, 0xFF, 0xF6, 0x43, 0x03, 0xA9, 0xD4, 0x19, 0x31, 0xD9, 0x47, 0x82, 0x14, 0x52, 0x07, 0xCA, 0x04};
-		int result = 0;
-
-		for (int i=0; i<num.length; i++)
-		{
-			result += num[i];
-			System.out.println(machine.intToHex(result));
-		}
-
-		System.out.println(machine.asl(170));
-		System.out.println(machine.asr(170));
-
-    //machine.print2dMemory(5);
-	}
+  public String format(int i)
+  {
+    return i<10 ? "00" + i : ((i<100) ? "0" + i : ""+ i);
+  }
 }
