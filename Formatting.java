@@ -1,7 +1,7 @@
 /**
+* This class takes care of visual formatting in the terminal
 *
-*
-* @author Michel Balamou   8124843
+* @author Michel Balamou
 * @version Nov 2017
 */
 
@@ -16,6 +16,8 @@ public class Formatting{
   public static final boolean COLOR_OUTPUT = true;
 
   //Use the following class variables with the method col(String, int)
+  public static final int WHITE = 0;
+
   public static final int BOLD_WHITE = 1;
   public static final int DARK_GREY = 2;
   public static final int UNDERLINE = 4;
@@ -71,15 +73,15 @@ public class Formatting{
   }
 
   /**
-  * Clears the Terminal content
+  * Clears the Terminal content.
   */
-  private void clear(){
+  public static void clear(){
     System.out.print("\033[H\033[2J");
   }
 
   /**
-  *
-  *
+  * Prints a 2D table with a colored output.
+  * Every number represents the color of the output.
   */
   public static void printColorTable()
   {
@@ -97,8 +99,13 @@ public class Formatting{
   }
 
   /**
+  * Autocompletes the integer if it is less than 100.
+  * Examples:
+  *  2 -> 002
+  *  34 -> 034
+  *  234 ->234
   *
-  * @param i
+  * @param i integer to be completed
   */
   public static String format(int i)
   {
@@ -107,8 +114,22 @@ public class Formatting{
 
 
   /**
+  * Waits for user to press a key before continuing
   *
-  *
+  * @param msg
+  */
+  public static void pressAnyKeyToContinue(String msg)
+  {
+      System.out.println(msg);
+      try{
+         System.in.read();
+      }
+      catch(Exception e){
+      }
+  }
+
+  /**
+  * Prints a colored table
   */
   public static void main(String[] args)
   {

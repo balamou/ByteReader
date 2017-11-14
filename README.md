@@ -7,7 +7,7 @@
 
 ## TODO
 
-  - [ ] Step by step execution with memory cell display
+  - [X] Step by step execution with memory cell display
   - [ ] Convert formats from binary to pseudo code
   - [ ] Add a test class that checks the integrity of the program
   - [ ] Make a class for for storing every step
