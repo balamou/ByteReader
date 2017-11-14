@@ -17,6 +17,12 @@ public class Asm
   public static final int GREEN = 92;
   public static final int BLUE = 36;
   public static final int RED = 31;
+  public static final int BRIGHT_RED = 91;
+  public static final int BRIGHT_GREEN = 92;
+
+  public static final int RED_BKG = 101;
+  public static final int BLUE_BKG = 104;
+
 
 	public static final boolean COLOR_OUTPUT = true;
 	public static final boolean SHOWSTEPS = true;
@@ -106,7 +112,7 @@ public class Asm
 				// keep adding strings to the memory
 				if (line.charAt(0)!='%') // ignore strings starting with %
 				{
-					String[] command=line.split(" "); // split the line at space
+					String[] command = line.split(" "); // split the line at space
 
 					int addr = Integer.parseInt(command[0], 16);
 					int inst = Integer.parseInt(command[1], 16);
@@ -372,7 +378,6 @@ public class Asm
 	{
 			for (int i = 0; i<size; i++)
 			{
-				int addr = i;
 				int inst = memory[i];
 				int instp = before[i];
 
@@ -380,11 +385,201 @@ public class Asm
 				{
 					int color = (inst == instp ? WHITE : RED);
 					String eq = (inst == instp) ? HEX(instp) : HEX(instp) + " -> " + HEX(inst);
-					System.out.println(col(HEX(addr) + ": " + eq, color));
+					System.out.println(col(HEX(i) + ": " + eq, color));
 				}
 			}
 	}
 
+  /**
+  * Clears the Terminal content
+  */
+  private void clear()
+  {
+    System.out.print("\033[H\033[2J");
+  }
+
+  /**
+  * Prints a two dimentional grid of the memory
+  *
+  * @param addr
+	*/
+	public void print2dMemory(int[] mem, int addr, int delta_cell)
+	{
+      String line = "     ";
+      for (int i = 0; i<16; i++)
+        line += HEX(i) + "  ";
+
+      line = col(line, 104) + "\n" + col("  ", 104);
+
+			for (int i = 0; i<size; i++)
+			{
+				int inst = mem[i];
+
+        if (i % 16 == 0)
+          line+="\n" + col(HEX(i), 104) + "   ";
+
+        int color = (i == addr ? 101 : RED);
+        color = (i==delta_cell) ? BRIGHT_GREEN : color;
+        line += col(HEX(mem[i]), mem[i]!=0 ? color : WHITE) + "  ";
+			}
+
+      System.out.println(line);
+	}
+
+  /**
+  * Executes the intructions loaded to the memory from a file.
+  *
+  * @param filename the name of the file with the instructions
+  */
+  public void executeStepwise(String filename)
+  {
+    loadToMemory(filename); // load instructions to the memory matrix
+    before = memory.clone(); // save the initial state of the memory
+
+    int AC = 0; // set the Acumulator Register to 0
+
+    for (int i=0; i<size; i++)
+    {
+      int inst = memory[i]; // fetch instruction
+      String hex = intToHex(inst); // hexadecimal representation of the instruction
+
+
+      int direct = i<size - 1 ? memory[i + 1] : 0;
+      int indirect = direct<size-1 ? memory[direct] : 0;
+
+      String[] dir = {"1", "2", "3", "4", "8", "10", "20"};
+      String[] line = {"41", "42", "44", "48", "50", "60"};
+
+      boolean isDirect = hex.equals("1") || hex.equals("2") || hex.equals("3") || hex.equals("4") || hex.equals("8") || hex.equals("10") || hex.equals("20");
+      int ref = isDirect ? direct : indirect;
+
+      String hex2 = direct<size - 2 ? intToHex(memory[i + 2]) : "0";
+      boolean oneLine =  hex2.equals("41") || hex2.equals("42") || hex2.equals("44") || hex2.equals("48") || hex2.equals("50") || hex2.equals("60");
+
+      // Step screen data
+      int bfr = i; // PC address before changes
+      int delta_cell = -1;
+
+      switch (hex)
+      {
+        case "1": //AND
+        case "81": //AND indirect
+          AC = and(AC, memory[ref]);
+          i++;
+          print("AC AND " + HEX(memory[ref]) + " = " + AC, RED);
+        break;
+
+        case "2": //ADD
+        case "82": //ADD indirect
+          AC += memory[ref];
+          AC = truncate(AC);
+          i++;
+          print("AC+=" + HEX(memory[ref]), RED);
+        break;
+
+        case "3": //SUB
+        case "83": //SUB indirect
+          AC -= memory[ref];
+          AC = truncate(AC);
+          i++;
+          print("AC-=" + HEX(memory[ref]), RED);
+        break;
+
+        case "4": //LDA
+        case "84": //LDA indirect
+          AC = memory[ref];
+          i++; // skip address
+
+          print("AC=" + HEX(AC), RED);
+        break;
+
+        case "8": //STA
+        case "88": //STA indirect
+          memory[ref] = AC;
+          i++; // skip address
+          delta_cell = ref;
+
+          print("M["+HEX(ref)+"]<-" + HEX(AC), YELLOW);
+        break;
+
+        case "10": //BUN
+        case "90": //BUN indirect
+          i = (isDirect ? direct : indirect) - 1;
+
+          print("  BUN to: " + HEX(i + 1), WHITE);
+        break;
+
+        case "20": //ISZ
+        case "A0": //ISZ indirect
+          memory[ref] = truncate(memory[ref] + 1);
+          i++;
+
+          print("  ISZ - " + "M[" + HEX(ref) + "]: " + HEX(memory[ref]), WHITE);
+
+          if (memory[ref]==0)
+          {
+            print("SKIP", WHITE);
+            i += (oneLine ? 1 : 2);
+          }
+        break;
+
+
+        case "41": //CLA
+          AC = 0;
+          print("AC=0", RED);
+        break;
+
+        case "42": //CMA
+          AC = complement(AC);
+          print("(AC)'=" + HEX(AC), YELLOW);
+        break;
+
+        case "44": //ASL
+          AC = asl(AC);
+          print("AC asl -> " + HEX(AC), YELLOW);
+        break;
+
+        case "48": //ASR
+          AC = asr(AC);
+          print("AC asr -> " + HEX(AC), YELLOW);
+        break;
+
+        case "50": //INC
+          AC++;
+          print("AC++", BLUE);
+        break;
+
+        case "60": //HLT
+          print("HALT", RED);
+          return ;
+
+        default:
+          warning("Attempting to execute unknown opcode: 0x" + HEX(inst));
+          break;
+      }
+
+      clear();
+      System.out.println("PC = " + HEX(bfr));
+      System.out.println("AC = " + HEX(AC));
+      System.out.println();
+      print2dMemory(memory, bfr, delta_cell);
+      pressAnyKeyToContinue();
+    }
+  }
+
+  /**
+  * Waits for user to press a key before continuing
+  */
+  private void pressAnyKeyToContinue()
+  {
+      System.out.println("Press Enter key to continue...");
+      try{
+         System.in.read();
+      }
+      catch(Exception e){
+
+      }
+  }
 	/**
 	* Fills any binary string that is less than 8 bits with zeros in the most
 	* significant positions.
@@ -513,14 +708,16 @@ public class Asm
 		Asm machine = new Asm();
 
 		System.out.println(col("START", GREEN));
-		machine.execute(args[0]);
+	  //machine.execute(args[0]);
 		System.out.println();
 
-		machine.printNonEmptyDiff();
+		//machine.printNonEmptyDiff();
 
 		System.out.println();
 
 		machine.showWarnings();
+    machine.executeStepwise(args[0]);
+
 		//test(machine);
 	}
 
@@ -558,5 +755,7 @@ public class Asm
 
 		System.out.println(machine.asl(170));
 		System.out.println(machine.asr(170));
+
+    //machine.print2dMemory(5);
 	}
 }

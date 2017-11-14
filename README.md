@@ -5,12 +5,12 @@
 
   <img src="https://i.imgur.com/bRsLszW.png" width="20%"/> <img src="https://i.imgur.com/MtkBLOv.png" width="20%"/> <img src="https://i.imgur.com/fYdLGMA.png" width="20%"/>
 
-
 ## TODO
 
   - [ ] Step by step execution with memory cell display
   - [ ] Convert formats from binary to pseudo code
-
+  - [ ] Add a test class that checks the integrity of the program
+  - [ ] Make a class for for storing every step
 
 ## Contributors:
   :bowtie: Michel Balamou
