@@ -399,13 +399,7 @@ public class Asm
 			}
 	}
 
-  /**
-  * Clears the Terminal content
-  */
-  private void clear()
-  {
-    System.out.print("\033[H\033[2J");
-  }
+
 
   /**
   * Prints a two dimentional grid of the memory
@@ -705,23 +699,4 @@ public class Asm
 
 		return Integer.parseInt(result, 2);
 	}
-
-  public void printColorTable()
-  {
-    String line = "";
-    for (int i=0; i<400; i++)
-    {
-      if (i%20 ==0)
-        line+="\n";
-
-      line+= col(format(i), i) + "  ";
-    }
-
-    System.out.println(line);
-  }
-
-  public String format(int i)
-  {
-    return i<10 ? "00" + i : ((i<100) ? "0" + i : ""+ i);
-  }
 }
