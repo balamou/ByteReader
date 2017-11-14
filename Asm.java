@@ -56,7 +56,7 @@ public class Asm
 		before = new int[size][1]; // size x 1 byte
 
 		// Fill the memory with zeros
-		for (int i = 0; i< size; i++)
+		for (int i = 0; i<size; i++)
 		{
 			memory[i][0] = 0;
 			before[i][0] = 0;
@@ -85,7 +85,7 @@ public class Asm
 
 	    int[][] result = new int[input.length][];
 
-	    for (int i = 0; i < input.length; i++)
+	    for (int i = 0; i<input.length; i++)
 	        result[i] = input[i].clone();
 
 	    return result;
@@ -179,7 +179,7 @@ public class Asm
 	public void execute(String filename)
 	{
 		loadToMemory(filename); // load instructions to the memory matrix
-		before=deepCopyIntMatrix(memory); // save the initial state of the memory
+		before = deepCopyIntMatrix(memory); // save the initial state of the memory
 
 		int AC = 0; // set the Acumulator Register to 0
 
@@ -259,7 +259,7 @@ public class Asm
 					if (memory[ref][0]==0)
 					{
 						print("SKIP", WHITE);
-						i+=(oneLine ? 1 : 2);
+						i += (oneLine ? 1 : 2);
 					}
 				break;
 
@@ -275,12 +275,12 @@ public class Asm
 				break;
 
 				case "44": //ASL
-					AC=asl(AC);
+					AC = asl(AC);
 					print("AC asl -> " + HEX(AC), YELLOW);
 				break;
 
 				case "48": //ASR
-					AC=asr(AC);
+					AC = asr(AC);
 					print("AC asr -> " + HEX(AC), YELLOW);
 				break;
 
@@ -309,7 +309,7 @@ public class Asm
 	* @return DEC number
 	*/
 	public int hexToInt(String hexString)
-	{
+  {
 		return Integer.parseInt(hexString, 16);
 	}
 
@@ -388,7 +388,7 @@ public class Asm
 	*/
 	public void printNonEmptyDiff()
 	{
-			for (int i = 0; i< size; i++)
+			for (int i = 0; i<size; i++)
 			{
 				int addr = i;
 				int inst = memory[i][0];
@@ -415,9 +415,9 @@ public class Asm
 	*/
 	public String fill(String bin)
 	{
-		String result="";
-		for (int i=0;i < 8-bin.length(); i++)
-			result+="0";
+		String result = "";
+		for (int i = 0; i<8-bin.length(); i++)
+			result += "0";
 
 		return result + bin;
 	}
@@ -434,8 +434,8 @@ public class Asm
 	*/
 	public int complement(int dec)
 	{
-		String bin=fill(Integer.toBinaryString(dec)); // convert DEC to BIN, and fill missing zeros
-		String result="";
+		String bin = fill(Integer.toBinaryString(dec)); // convert DEC to BIN, and fill missing zeros
+		String result = "";
 
 		for(int i=0; i<bin.length(); i++)
 			 result += (bin.charAt(i)=='0' ? '1' : '0');
@@ -464,10 +464,10 @@ public class Asm
 	public int and(int dec1, int dec2)
 	{
 		// convert DEC to BIN, and fill missing zeros
-		String bin1=fill(Integer.toBinaryString(dec1));
-		String bin2=fill(Integer.toBinaryString(dec2));
+		String bin1 = fill(Integer.toBinaryString(dec1));
+		String bin2 = fill(Integer.toBinaryString(dec2));
 
-		String result="";
+		String result = "";
 
 		for(int i=0; i<bin1.length(); i++)
 		{
@@ -491,8 +491,8 @@ public class Asm
 	*/
 	public int asl(int dec)
 	{
-		String bin=fill(Integer.toBinaryString(dec));
-		String result=bin.substring(1) + "0";
+		String bin = fill(Integer.toBinaryString(dec));
+		String result = bin.substring(1) + "0";
 
 		return Integer.parseInt(result, 2);
 	}
@@ -508,8 +508,8 @@ public class Asm
 	*/
 	public int asr(int dec)
 	{
-		String bin=fill(Integer.toBinaryString(dec));
-		String result=bin.charAt(0)+bin.substring(0, bin.length()-1);
+		String bin = fill(Integer.toBinaryString(dec));
+		String result = bin.charAt(0)+bin.substring(0, bin.length()-1);
 
 		return Integer.parseInt(result, 2);
 	}
@@ -560,7 +560,7 @@ public class Asm
 
 		System.out.println(machine.complement(30));
 		System.out.println(machine.complement(23));
-    
+
 		System.out.println();
 
 		System.out.println(machine.and(30, 23));
