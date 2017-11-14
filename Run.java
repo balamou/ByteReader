@@ -1,8 +1,10 @@
 /**
-*
+* This class runs and tests the integrity of the machine executing code.
 *
 * @author michelbalamou@gmail.com
 */
+import java.util.Arrays;
+
 public class Run
 {
     /**
@@ -19,25 +21,33 @@ public class Run
       }
 
       Asm machine = new Asm();
+      String filename = args[0];
 
-      /*
-      System.out.println(col("START", GREEN));
-      machine.execute(args[0]);
-      System.out.println();
-
-      machine.printNonEmptyDiff();
-      */
-
-      System.out.println();
-
+      // Display warnings
       machine.showWarnings();
-      machine.executeStepwise(args[0], true);
 
-      //machine.printColorTable();
+      if (args[0].equals("-t"))
+      {
+        test();
+      }
+      else
+      // Convert step exeuction into pseudo code
+      if (args.length>1 && args[1].equals("-s"))
+      {
+        System.out.println(Formatting.col("START", Formatting.GREEN));
+        machine.execute(filename, false);
+        System.out.println();
 
-      //machine.showSteps();
+        machine.showSteps();
+        machine.printNonEmptyDiff();
+      }
+      // Run stepwise execution
+      else
+      {
+        System.out.println();
 
-      //test(machine);
+        machine.execute(filename, true);
+      }
     }
 
 
@@ -46,7 +56,7 @@ public class Run
     *
     * @param machine
     */
-    public static void test(Asm machine)
+    public static void former_test(Asm machine)
     {
       System.out.println();
       System.out.println();
@@ -76,5 +86,42 @@ public class Run
       System.out.println(Logic.asr(170));
 
       //machine.print2dMemory(5);
+    }
+
+    /**
+    * Tests the integrity of the code.
+    *
+    */
+    public static void test()
+    {
+      Asm machine = new Asm();
+
+      boolean test1 = check(machine, "fibonacci.asm");
+      boolean test2 = check(machine, "test1.asm");
+      boolean test3 = check(machine, "test2.asm");
+
+      if (test1)
+        System.out.println("Test 1: Fibonacci sequence passed successfully");
+      else
+        System.out.println("Test 1 failed");
+
+      if (test2)
+        System.out.println("Test 2: passed successfully");
+      else
+        System.out.println("Test 2 failed");
+
+      if (test3)
+        System.out.println("Test 3: passed successfully");
+      else
+        System.out.println("Test 3 failed");
+    }
+
+    public static boolean check(Asm machine, String file)
+    {
+      machine.execute("data/" + file, false);
+      int[] exp = machine.loadToMemory("expected/" + file);
+      int[] result = machine.getMem();
+
+      return Arrays.equals(result, exp);
     }
 }

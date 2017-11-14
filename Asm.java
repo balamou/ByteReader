@@ -36,16 +36,21 @@ public class Asm
 		memory = new int[size]; // size x 1 byte
 		before = new int[size]; // size x 1 byte
 
-		// Fill the memory with zeros
+		clear();
+
+		warningQueue = new LinkedList<String>(); // Initialize warning queue
+    steps = new LinkedList<String>();
+	}
+
+  public void clear()
+  {
+    // Fill the memory with zeros
 		for (int i = 0; i<size; i++)
 		{
 			memory[i] = 0;
 			before[i] = 0;
 		}
-
-		warningQueue = new LinkedList<String>(); // Initialize warning queue
-    steps = new LinkedList<String>();
-	}
+  }
 
 	/**
 	* Initializes a memory with 256 address spaces
@@ -74,8 +79,10 @@ public class Asm
 	*
 	* @param filename the name of the file with the instructions
 	*/
-	public void loadToMemory(String filename)
+	public int[] loadToMemory(String filename)
 	{
+    int[] memory = new int[DEFAULT_SIZE];
+
 		try
 		{
 			File file = new File(filename);
@@ -113,6 +120,8 @@ public class Asm
 		{
 			e.printStackTrace();
 		}
+
+    return memory;
 	}
 
 
@@ -229,9 +238,10 @@ public class Asm
   *
   * @param filename the name of the file with the instructions
   */
-  public void executeStepwise(String filename, boolean stepwise)
+  public void execute(String filename, boolean stepwise)
   {
-    loadToMemory(filename); // load instructions to the memory matrix
+    clear();
+    memory = loadToMemory(filename); // load instructions to the memory matrix
     before = memory.clone(); // save the initial state of the memory
 
     int AC = 0; // set the Acumulator Register to 0
@@ -372,6 +382,11 @@ public class Asm
         //Formatting.pressAnyKeyToContinue("Press Enter key to continue...");
       }
     }
+  }
+
+  public int[] getMem()
+  {
+    return memory;
   }
 
   public void sleep(int time)

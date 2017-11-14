@@ -11,6 +11,8 @@
   - [ ] Convert formats from binary to pseudo code
   - [ ] Add a test class that checks the integrity of the program
   - [ ] Make a class for for storing every step
+  - [ ] Add a gif with the memory execution
+  - [ ] Add user friendly options 
 
 ## Contributors:
   :bowtie: Michel Balamou
