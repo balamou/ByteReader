@@ -1,3 +1,5 @@
+% Generates a Fibonacci sequence in memory cells 80 to 8B %
+% The result is a sequence: 01, 01, 02, 03, 05, 08, 0D, 15, 22, 37, 59, 90 %
 % ========== MAIN ========== %
 00 04  % LDA (direct) %
 01 a0

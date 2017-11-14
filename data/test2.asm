@@ -1,3 +1,8 @@
+% Adds numbers stored in memory addresses 85 to 9D until the sum is equal to zero. %
+% As soon as the sum is 0, the program stores the address of the last added number %
+% to cell 80, and the number itself to cell 84. Then the program halts. %
+% --------------------------------------------------------------------- %
+% The result of this program: cell 80 stores 96, and cell 84 stores D9  %
 % ========== MAIN ========== %
 00 84
 01 80
@@ -16,7 +21,7 @@
 0E 80
 0F 08
 10 84
-11 60
+11 60 % HALT %
 % ========== SUBROUTINE ========== %
 18 04
 19 80
@@ -55,7 +60,7 @@
 93 D4
 94 19
 95 31
-96 D9  % will be equal to 0 %
+96 D9  % the sum will equal to 0 %
 97 47
 98 82
 99 14

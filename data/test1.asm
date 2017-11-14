@@ -1,3 +1,4 @@
+% Test code: cell A0 stores 5F, cell A1 stores FA %
 % ========== MAIN ========== %
 00 04  % LDA (direct) %
 01 80
