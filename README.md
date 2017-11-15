@@ -5,7 +5,7 @@
 
 | A | B | C | D |
 |---|---|---|---|
-| <img src="https://i.imgur.com/XnOPQIs.png" width="20%"/> | <img src="https://i.imgur.com/bRsLszW.png" width="20%"/> | <img src="https://i.imgur.com/MtkBLOv.png" width="20%"/> | <img src="https://i.imgur.com/fYdLGMA.png" width="20%"/> |
+| <img src="https://i.imgur.com/XnOPQIs.png"/> | <img src="https://i.imgur.com/bRsLszW.png"/> | <img src="https://i.imgur.com/MtkBLOv.png"/> | <img src="https://i.imgur.com/fYdLGMA.png"/> |
 
 ## TODO
 
