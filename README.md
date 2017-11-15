@@ -17,10 +17,10 @@
 
 ## Instructions:
 
-    | Command | Function |
-    |---------|----------|
-    | -t | Tests the code for accuracy |
-    | -s | Shows all steps at once |
+| Command | Function |
+|---------|----------|
+| -t | Tests the code for accuracy |
+| -s | Shows all steps at once |
 
 ## Contributors:
   :bowtie: Michel Balamou
