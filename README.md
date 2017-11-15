@@ -3,7 +3,9 @@
 
 ## Screenshots:
 
-  <img src="https://i.imgur.com/bRsLszW.png" width="20%"/> <img src="https://i.imgur.com/MtkBLOv.png" width="20%"/> <img src="https://i.imgur.com/fYdLGMA.png" width="20%"/>
+| A | B | C | D |
+|---|---|---|---|
+| <img src="https://i.imgur.com/XnOPQIs.png" width="20%"/> | <img src="https://i.imgur.com/bRsLszW.png" width="20%"/> | <img src="https://i.imgur.com/MtkBLOv.png" width="20%"/> | <img src="https://i.imgur.com/fYdLGMA.png" width="20%"/> |
 
 ## TODO
 
