@@ -9,10 +9,18 @@
 
   - [X] Step by step execution with memory cell display
   - [ ] Convert formats from binary to pseudo code
-  - [ ] Add a test class that checks the integrity of the program
+  - [X] Add a test class that checks the integrity of the program
   - [ ] Make a class for for storing every step
   - [ ] Add a gif with the memory execution
-  - [ ] Add user friendly options 
+  - [ ] Add user friendly options
+  - [ ] Add a help command
+
+## Instructions:
+
+    | Command | Function |
+    |---------|----------|
+    | -t | Tests the code for accuracy |
+    | -s | Shows all steps at once |
 
 ## Contributors:
   :bowtie: Michel Balamou

@@ -118,7 +118,7 @@ public class Formatting{
   *
   * @param msg
   */
-  public static void pressAnyKeyToContinue(String msg)
+  public static void press(String msg)
   {
       System.out.println(msg);
       try{

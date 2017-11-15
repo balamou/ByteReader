@@ -116,6 +116,11 @@ public class Run
         System.out.println("Test 3 failed");
     }
 
+    /**
+    *
+    * @param machine
+    * @param file
+    */
     public static boolean check(Asm machine, String file)
     {
       machine.execute("data/" + file, false);

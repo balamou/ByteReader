@@ -233,6 +233,33 @@ public class Asm
       System.out.println(line);
 	}
 
+
+  private boolean isDirect(String hex)
+  {
+      String[] dir = {"1", "2", "3", "4", "8", "10", "20"};
+
+      for (int i=0; i<dir.length; i++)
+      {
+        if (hex.equals(dir[i]))
+          return true;
+      }
+
+      return false;
+  }
+
+  private boolean isOneLine(String hex)
+  {
+      String[] line = {"41", "42", "44", "48", "50", "60"};
+
+      for (int i=0; i<line.length; i++)
+      {
+        if (hex.equals(line[i]))
+          return true;
+      }
+
+      return false;
+  }
+
   /**
   * Executes the intructions loaded to the memory from a file.
   *
@@ -253,19 +280,12 @@ public class Asm
       int inst = memory[i]; // fetch instruction
       String hex = Logic.intToHex(inst); // hexadecimal representation of the instruction
 
-
       int direct = i<size - 1 ? memory[i + 1] : 0;
       int indirect = direct<size-1 ? memory[direct] : 0;
 
-      String[] dir = {"1", "2", "3", "4", "8", "10", "20"};
-      String[] line = {"41", "42", "44", "48", "50", "60"};
+      int ref = isDirect(hex) ? direct : indirect;
 
-      boolean isDirect = hex.equals("1") || hex.equals("2") || hex.equals("3") || hex.equals("4") || hex.equals("8") || hex.equals("10") || hex.equals("20");
-      int ref = isDirect ? direct : indirect;
-
-      String hex2 = direct<size - 2 ? Logic.intToHex(memory[i + 2]) : "0";
-      boolean oneLine =  hex2.equals("41") || hex2.equals("42") || hex2.equals("44") || hex2.equals("48") || hex2.equals("50") || hex2.equals("60");
-
+      String next_command = direct<size - 2 ? Logic.intToHex(memory[i + 2]) : "0";
       // Step screen data
       int bfr = i; // PC address before changes
 
@@ -313,7 +333,7 @@ public class Asm
 
         case "10": //BUN
         case "90": //BUN indirect
-          i = (isDirect ? direct : indirect) - 1;
+          i = (isDirect(hex) ? direct : indirect) - 1;
 
           steps.add("  BUN to: " + HEX(i + 1));
         break;
@@ -328,7 +348,7 @@ public class Asm
           if (memory[ref]==0)
           {
             steps.add("SKIP");
-            i += (oneLine ? 1 : 2);
+            i += (isOneLine(next_command) ? 1 : 2);
           }
         break;
 
@@ -379,16 +399,24 @@ public class Asm
         iteration++;
 
         sleep(500);
-        //Formatting.pressAnyKeyToContinue("Press Enter key to continue...");
+        //Formatting.press("Press Enter key to continue...");
       }
     }
   }
 
+  /**
+  * @return the memory array
+  */
   public int[] getMem()
   {
     return memory;
   }
 
+  /**
+  *
+  *
+  * @param time
+  */
   public void sleep(int time)
   {
     try
