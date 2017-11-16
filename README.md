@@ -1,7 +1,17 @@
 # ByteReader
   Reads binary commands from a .asm file and executes them step by step.
 
-## Screenshots:
+## Instructions:
+
+  The memory cells after running a machine file:
+
+      java Run data/fibonacci
+
+  <img src="https://i.imgur.com/XnOPQIs.png"/>
+
+  The green cells represent the cells that have been changed. The cell with a RED
+  background is the current operation (PC register). The following program generates
+  a fibonacci sequence in addresses starting from 80h to 8Bh.
 
 | A | B | C | D |
 |---|---|---|---|
@@ -17,7 +27,7 @@
   - [ ] Add user friendly options
   - [ ] Add a help command
 
-## Instructions:
+## Commands:
 
 | Command | Function |
 |---------|----------|
