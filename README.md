@@ -18,11 +18,11 @@
   The following command will create a 2D view of the memory and run a step by step
   execution of the program:
 
-  <img src="https://i.imgur.com/XnOPQIs.png" width="30%" />
+  <img src="https://i.imgur.com/XnOPQIs.png" width="40%" />
 
-  The GREEN cells represent the cells that have been changed.
-  The cell with a RED background is the current operation (PC register).
-  The following program generates a fibonacci sequence in addresses starting from 80h to 8Bh.
+  The GREEN cells represent the cells that have been changed.\n
+  The cell with a RED background is the current operation (PC register).\n
+  The following program generates a fibonacci sequence in addresses starting from 80h to 8Bh.\n
 
   The format of the .asm files looks like this:
 
@@ -32,15 +32,18 @@
       <address of the command> <command>
 
   Example:
-  <img src="https://i.imgur.com/bRsLszW.png" width="20%" />
+
+  <img src="https://i.imgur.com/bRsLszW.png" width="30%" />
 
   The final result can be shown by running:
 
       $ run data/fibonacci.asm -s
 
+  Result:
+
 | Instructions | Final result |
 |---|---|
-| <img src="https://i.imgur.com/MtkBLOv.png"/> | <img src="https://i.imgur.com/fYdLGMA.png"/> |
+| <img src="https://i.imgur.com/MtkBLOv.png"  width="20%" /> | <img src="https://i.imgur.com/fYdLGMA.png"  width="20%"/> |
 
 ## TODO
 
