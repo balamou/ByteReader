@@ -21,6 +21,9 @@ public class Asm
 	private Queue<String> warningQueue;
   private Queue<String> steps;
 
+	// parameters
+	private boolean printFinal = false;
+
 	//Class methods *****************************************************
 
 
@@ -58,6 +61,11 @@ public class Asm
 	public Asm()
 	{
 		this(DEFAULT_SIZE);
+	}
+
+	public void setPrintFinal(boolean p)
+	{
+		printFinal = p;
 	}
 
 	/**
@@ -380,6 +388,14 @@ public class Asm
 
         case "60": //HLT
           steps.add("HALT");
+
+					if(printFinal)
+					{
+						Formatting.clear();
+		        System.out.println(Formatting.col("                         FINAL MEMORY STATE", Formatting.GREEN));
+						System.out.println();
+		        print2dMemory(memory, bfr, changed);
+					}
           return ;
 
         default:

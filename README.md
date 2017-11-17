@@ -20,9 +20,11 @@
 
   <img src="https://i.imgur.com/XnOPQIs.png" width="40%" />
 
-  The GREEN cells represent the cells that have been changed.\n
-  The cell with a RED background is the current operation (PC register).\n
-  The following program generates a fibonacci sequence in addresses starting from 80h to 8Bh.\n
+  The GREEN cells represent the cells that have been changed.
+
+  The cell with a RED background is the current operation (PC register).
+
+  The following program generates a fibonacci sequence in addresses starting from 80h to 8Bh.
 
   The format of the .asm files looks like this:
 

@@ -32,14 +32,22 @@ public class Run
       }
       else
       // Convert step exeuction into pseudo code
-      if (args.length>1 && args[1].equals("-s"))
+      if (args.length>1)
       {
-        System.out.println(Formatting.col("START", Formatting.GREEN));
-        machine.execute(filename, false);
-        System.out.println();
+        if (args[1].equals("-s"))
+        {
+          System.out.println(Formatting.col("START", Formatting.GREEN));
+          machine.execute(filename, false);
+          System.out.println();
 
-        machine.showSteps();
-        machine.printNonEmptyDiff();
+          machine.showSteps();
+          machine.printNonEmptyDiff();
+        }
+        else if (args[1].equals("-f"))
+        {
+          machine.setPrintFinal(true);
+          machine.execute(filename, false);
+        }
       }
       // Run stepwise execution
       else
