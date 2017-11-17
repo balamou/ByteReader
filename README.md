@@ -3,19 +3,44 @@
 
 ## Instructions:
 
-  The memory cells after running a machine file:
+  Open the terminal, go to the bin/ folder and type (without the dollar sign):
 
-      java Run data/fibonacci
+      $ . setup
 
-  <img src="https://i.imgur.com/XnOPQIs.png"/>
+  This allows bash to run temporarily the program from anywhere in your filesystem.
+  If you want it to persist through logins, add the absolute path to bin in your ~/.bashrc file
+  in the $PATH variable.  
 
-  The green cells represent the cells that have been changed. The cell with a RED
-  background is the current operation (PC register). The following program generates
-  a fibonacci sequence in addresses starting from 80h to 8Bh.
+  You can test the program by going to the src/folder and typing:
 
-| A | B | C | D |
-|---|---|---|---|
-| <img src="https://i.imgur.com/XnOPQIs.png"/> | <img src="https://i.imgur.com/bRsLszW.png"/> | <img src="https://i.imgur.com/MtkBLOv.png"/> | <img src="https://i.imgur.com/fYdLGMA.png"/> |
+      $ run data/fibonacci
+
+  The following command will create a 2D view of the memory and run a step by step
+  execution of the program:
+
+  <img src="https://i.imgur.com/XnOPQIs.png" width="30%" />
+
+  The GREEN cells represent the cells that have been changed.
+  The cell with a RED background is the current operation (PC register).
+  The following program generates a fibonacci sequence in addresses starting from 80h to 8Bh.
+
+  The format of the .asm files looks like this:
+
+      % Comments starts with a percent %
+      <address of the command> <command>
+      <address of the command> <command>
+      <address of the command> <command>
+
+  Example:
+  <img src="https://i.imgur.com/bRsLszW.png" width="20%" />
+
+  The final result can be shown by running:
+
+      $ run data/fibonacci.asm -s
+
+| Instructions | Final result |
+|---|---|
+| <img src="https://i.imgur.com/MtkBLOv.png"/> | <img src="https://i.imgur.com/fYdLGMA.png"/> |
 
 ## TODO
 
@@ -32,6 +57,7 @@
 | Command | Function |
 |---------|----------|
 | -t | Tests the code for accuracy |
+| -f | Shows the final memory state |
 | -s | Shows all steps at once |
 
 ## Contributors:

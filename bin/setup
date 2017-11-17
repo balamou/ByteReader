@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-# Runs the java classes from the terminal
+# Source this file to export $PATH:
+#   $ . setup
+#
 # @author michelbalamou@gmail.com
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-java -cp $DIR/class Run ${@}
+export PATH=$PATH:$DIR
