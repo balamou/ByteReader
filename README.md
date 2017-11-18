@@ -11,9 +11,9 @@
   If you want it to persist through logins, add the absolute path to bin in your ~/.bashrc file
   in the $PATH variable.  
 
-  You can test the program by going to the src/folder and typing:
+  You can test the program by going to the test/data folder and typing:
 
-      $ run data/fibonacci
+      $ run fibonacci.asm
 
   The following command will create a 2D view of the memory and run a step by step
   execution of the program:
@@ -35,17 +35,15 @@
 
   Example:
 
-  <img src="https://i.imgur.com/bRsLszW.png" width="30%" />
+  <img src="https://i.imgur.com/bRsLszW.png" width="30%" align="center"/>
 
   The final result can be shown by running:
 
-      $ run data/fibonacci.asm -s
+      $ run fibonacci.asm -s
 
   Result:
 
-| Instructions | Final result |
-|---|---|
-| <img src="https://i.imgur.com/MtkBLOv.png"  width="20%" /> | <img src="https://i.imgur.com/fYdLGMA.png"  width="20%"/> |
+  <img src="https://i.imgur.com/MtkBLOv.png"  width="20%" /> <img src="https://i.imgur.com/fYdLGMA.png"  width="20%"/>
 
 ## TODO
 

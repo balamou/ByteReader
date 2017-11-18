@@ -23,6 +23,9 @@ public class Asm
 
 	// parameters
 	private boolean printFinal = false;
+	private boolean stepwise = false;
+	private boolean pseudo_code = false;
+	private int time = 500;
 
 	//Class methods *****************************************************
 
@@ -68,6 +71,20 @@ public class Asm
 		printFinal = p;
 	}
 
+	public void setStepwise(boolean s)
+	{
+		stepwise = s;
+	}
+
+	public void setPseudo(boolean p)
+	{
+		pseudo_code = p;
+	}
+
+	public void setTime(int time)
+	{
+		this.time = time;
+	}
 	/**
 	* Reads line by line the file at 'filename'.
 	* It ignores lines starting by %. Every other line is split and the
@@ -105,15 +122,15 @@ public class Asm
 				{
 					String[] command = line.split(" "); // split the line at space
 
-					int addr = Integer.parseInt(command[0], 16);
-					int inst = Integer.parseInt(command[1], 16);
+					int addr = Logic.hexToInt(command[0]);
+					int inst = Logic.hexToInt(command[1]);
 					if (addr<size) // make sure the address doesnt exceed the size of the matrix
 					{
 						if (inst>255)
 						{
 							int tmp = inst;
 							inst = Logic.truncate(inst);
-								warningQueue.add("Attempting to insert instruction larger than 2 bytes 0x" + HEX(tmp) + "\n\t Default behaviour: truncate 0x" + HEX(inst));
+							warningQueue.add("Attempting to insert instruction larger than 2 bytes 0x" + HEX(tmp) + "\n\t Default behaviour: truncate 0x" + HEX(inst));
 						}
 
 						memory[addr] = inst;
@@ -129,6 +146,93 @@ public class Asm
 			e.printStackTrace();
 		}
 
+    return memory;
+	}
+
+	private int convertCommand(String command, boolean direct)
+	{
+		String[] MRI = {"AND", "ADD", "SUB", "LDA", "STA", "BUN", "ISZ"}; // memory reference commands
+		String[] bin_direct = {"01", "02", "03", "04", "08", "10", "20"};
+		String[] bin_indirect = {"81", "82", "83", "84", "88", "90", "A0"};
+
+		String[] RRF = {"CLA", "CMA", "ASL", "ASR", "INC", "HLT"}; // register reference commands
+		String[] bin_rrf = {"41", "42", "44", "48", "50", "60"};
+
+		for (int i = 0; i<MRI.length; i++)
+		{
+			if (MRI[i].equals(command))
+				return direct ? Logic.hexToInt(bin_direct[i]) : Logic.hexToInt(bin_indirect[i]);
+		}
+
+		for (int i = 0; i<RRF.length; i++)
+		{
+			if (RRF[i].equals(command))
+				return Logic.hexToInt(bin_rrf[i]);
+		}
+
+		return -1;
+	}
+
+	private boolean isMRI(String command)
+	{
+		String[] MRI = {"AND", "ADD", "SUB", "LDA", "STA", "BUN", "ISZ"}; // memory reference commands
+
+		for (int i = 0; i<MRI.length; i++)
+		{
+			if (MRI[i].equals(command))
+				return true;
+		}
+
+		return false;
+	}
+
+	public int[] parser(String filename)
+	{
+    int[] memory = new int[DEFAULT_SIZE];
+
+		try
+		{
+			File file = new File(filename);
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String line;
+			int i = 0;
+
+			while ((line = bufferedReader.readLine()) != null)
+			{
+				// keep adding strings to the memory
+				if (line.charAt(0)!='%') // ignore strings starting with %
+				{
+					String[] command = line.split(" "); // split the line at space
+
+					if (command[0].equals("ORG"))
+							i = Logic.hexToInt(command[1]);
+					else
+					{
+						int c = convertCommand(command[0], command.length>1 && command[1].charAt(0)!='@');
+
+						if (c==-1) // no such command found
+							memory[Logic.hexToInt(command[0])] = Logic.hexToInt(command[1]);
+						else
+						{
+							memory[i] = c;
+							if (isMRI(command[0]))
+								memory[++i] = Logic.hexToInt(command[1].replace("@",""));
+						}
+
+						i++;
+					}
+				}
+			}
+
+			fileReader.close();
+		}
+		catch (IOException e)
+		{
+			System.out.println(Formatting.col("Invalid filename!", Formatting.RED));
+		}
+
+		//print2dMemory(memory, 0, new LinkedList<Integer>());
     return memory;
 	}
 
@@ -273,10 +377,10 @@ public class Asm
   *
   * @param filename the name of the file with the instructions
   */
-  public void execute(String filename, boolean stepwise)
+  public void execute(String filename)
   {
     clear();
-    memory = loadToMemory(filename); // load instructions to the memory matrix
+    memory = pseudo_code ? parser(filename) : loadToMemory(filename); // load instructions to the memory matrix
     before = memory.clone(); // save the initial state of the memory
 
     int AC = 0; // set the Acumulator Register to 0
@@ -414,7 +518,7 @@ public class Asm
         print2dMemory(memory, bfr, changed);
         iteration++;
 
-        sleep(500);
+        sleep(time);
         //Formatting.press("Press Enter key to continue...");
       }
     }

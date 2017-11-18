@@ -32,30 +32,48 @@ public class Run
       }
       else
       // Convert step exeuction into pseudo code
-      if (args.length>1)
       {
-        if (args[1].equals("-s"))
+        boolean inst = isFlagSet(args, "--inst");
+        boolean steps = isFlagSet(args, "--steps");
+        boolean pseudo = isFlagSet(args, "--pseudo");
+
+        machine.setStepwise(steps);
+        machine.setPseudo(pseudo);
+        machine.setPrintFinal(!inst && !steps);
+
+
+        if (!inst || steps)
+        {
+          machine.execute(filename);
+        }
+        else
         {
           System.out.println(Formatting.col("START", Formatting.GREEN));
-          machine.execute(filename, false);
-          System.out.println();
 
+          machine.execute(filename);
+
+          System.out.println();
           machine.showSteps();
           machine.printNonEmptyDiff();
         }
-        else if (args[1].equals("-f"))
-        {
-          machine.setPrintFinal(true);
-          machine.execute(filename, false);
-        }
-      }
-      // Run stepwise execution
-      else
-      {
-        System.out.println();
 
-        machine.execute(filename, true);
       }
+    }
+
+    /**
+    *
+    * @param args
+    * @param flag
+    */
+    public static boolean isFlagSet(String[] args, String flag)
+    {
+      for (int i=1; i<args.length; i++)
+      {
+        if (args[i].equals(flag))
+          return true;
+      }
+
+      return false;
     }
 
 
@@ -131,7 +149,7 @@ public class Run
     */
     public static boolean check(Asm machine, String file)
     {
-      machine.execute("data/" + file, false);
+      machine.execute("data/" + file);
       int[] exp = machine.loadToMemory("expected/" + file);
       int[] result = machine.getMem();
 
