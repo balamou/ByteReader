@@ -155,6 +155,10 @@ public class Asm
 		String[] bin_direct = {"01", "02", "03", "04", "08", "10", "20"};
 		String[] bin_indirect = {"81", "82", "83", "84", "88", "90", "A0"};
 
+		//{"AND", "ADD", "SUB", "LDA", "STA", "BUN", "ISZ"}; // memory reference commands
+		//{"01", "02", "03", "04", "08", "10", "20"};
+		//{"81", "82", "83", "84", "88", "90", "A0"};
+
 		String[] RRF = {"CLA", "CMA", "ASL", "ASR", "INC", "HLT"}; // register reference commands
 		String[] bin_rrf = {"41", "42", "44", "48", "50", "60"};
 
@@ -548,4 +552,116 @@ public class Asm
     Thread.currentThread().interrupt();
     }
   }
+
+	/**
+	*
+	* @param bin
+	* @return
+	*/
+	private String convertToCommand(int bin)
+	{
+		String[] MRI = {"AND", "ADD", "SUB", "LDA", "STA", "BUN", "ISZ"}; // memory reference commands
+		String[] bin_direct = {"01", "02", "03", "04", "08", "10", "20"};
+		String[] bin_indirect = {"81", "82", "83", "84", "88", "90", "A0"};
+
+		String[] RRF = {"CLA", "CMA", "ASL", "ASR", "INC", "HLT"}; // register reference commands
+		String[] bin_rrf = {"41", "42", "44", "48", "50", "60"};
+
+		for (int i = 0; i<bin_direct.length; i++)
+		{
+			if (bin_direct[i].equals(HEX(bin)) || bin_indirect[i].equals(HEX(bin)))
+				return MRI[i];
+		}
+
+		for (int i = 0; i<bin_rrf.length; i++)
+		{
+			if (bin_rrf[i].equals(HEX(bin)))
+				return RRF[i];
+		}
+
+		return "NaN";
+	}
+
+	public String convertToPseudo(String filename)
+	{
+		String result = "";
+
+		try
+		{
+			File file = new File(filename);
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String line;
+			int prev = -2;
+			boolean c = false;
+
+			while ((line = bufferedReader.readLine()) != null)
+			{
+				// keep adding strings to the memory
+				if (line.charAt(0)!='%') // ignore strings starting with %
+				{
+					String[] command = line.split(" "); // split the line at space
+
+					int addr = Logic.hexToInt(command[0]);
+					int inst = Logic.hexToInt(command[1]);
+					if (addr<size) // make sure the address doesnt exceed the size of the matrix
+					{
+						if (inst>255)
+						{
+							int tmp = inst;
+							inst = Logic.truncate(inst);
+							warningQueue.add("Attempting to insert instruction larger than 2 bytes 0x" + HEX(tmp) + "\n\t Default behaviour: truncate 0x" + HEX(inst));
+						}
+
+						if (addr != prev + 1)
+						{
+							result += "ORG " + HEX(addr) + "\n";
+						}
+						else
+						{
+							if (c==true)
+							{
+								result += " " + HEX(inst) + "\n";
+								c = false;
+							}
+							else
+							{
+								String com = convertToCommand(inst);
+								System.out.println(Formatting.col(com + " " + inst, Formatting.RED) );
+
+								if (com.equals("NaN"))
+								{
+									result += HEX(addr) + " " + HEX(inst) + "\n";
+								}
+								else
+								{
+									if (isMRI(com))
+									{
+										result += convertToCommand(inst);
+										c = true;
+									}
+									else
+									{
+										result += convertToCommand(inst) + "\n";
+										c = false;
+									}
+								}
+							}
+						}
+
+						prev = addr;
+					}
+					else
+							warningQueue.add("Attempting to insert instruction at address 0x" + HEX(addr) + ". Max address is 0x" + HEX(size-1) + ". Check the instruction code.");
+				}
+			}
+			fileReader.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+    return result;
+	}
 }

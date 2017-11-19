@@ -26,13 +26,19 @@ public class Run
       // Display warnings
       machine.showWarnings();
 
-      if (args[0].equals("-t"))
+      if (args[0].equals("--test"))
       {
         test();
       }
       else
       // Convert step exeuction into pseudo code
       {
+        if (isFlagSet(args, "--convert"))
+        {
+          System.out.println(machine.convertToPseudo(filename));
+          return ;
+        }
+
         boolean inst = isFlagSet(args, "--inst");
         boolean steps = isFlagSet(args, "--steps");
         boolean pseudo = isFlagSet(args, "--pseudo");
