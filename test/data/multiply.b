@@ -1,0 +1,20 @@
+% ===== MAIN ===== %
+ORG 00
+LDA 80
+CMA
+STA 82
+ISZ 82
+BUN 20
+HLT
+% ===== SUBROUTINE ===== %
+ORG 20
+LDA 81
+ADD 83
+STA 83
+BUN 05
+% ===== DATA ===== %
+ORG 80
+80 12
+81 05
+82 00
+83 00

@@ -582,6 +582,20 @@ public class Asm
 		return "NaN";
 	}
 
+	private boolean isDirect2(String hex)
+  {
+      String[] direct = {"01", "02", "03", "04", "08", "10", "20"};
+
+      for (String command : direct)
+      {
+        if (hex.equals(command))
+          return true;
+      }
+
+      return false;
+  }
+
+
 	public String convertToPseudo(String filename)
 	{
 		String result = "";
@@ -594,6 +608,8 @@ public class Asm
 			String line;
 			int prev = -2;
 			boolean c = false;
+			boolean d = true;
+
 
 			while ((line = bufferedReader.readLine()) != null)
 			{
@@ -613,39 +629,33 @@ public class Asm
 							warningQueue.add("Attempting to insert instruction larger than 2 bytes 0x" + HEX(tmp) + "\n\t Default behaviour: truncate 0x" + HEX(inst));
 						}
 
-						if (addr != prev + 1)
-						{
+						if (addr != prev + 1 && !c)
 							result += "ORG " + HEX(addr) + "\n";
+
+						if (c==true)
+						{
+							result += " " + (d ? "" : "@") + HEX(inst) + "\n";
+							c = false;
+							d = true;
 						}
 						else
 						{
-							if (c==true)
+							String com = convertToCommand(inst);
+
+							if (com.equals("NaN"))
 							{
-								result += " " + HEX(inst) + "\n";
-								c = false;
+								result += HEX(addr) + " " + HEX(inst) + "\n";
+							}
+							else if (isMRI(com))
+							{
+									result += convertToCommand(inst);
+									c = true;
+									d = isDirect2(HEX(inst));
 							}
 							else
 							{
-								String com = convertToCommand(inst);
-								System.out.println(Formatting.col(com + " " + inst, Formatting.RED) );
-
-								if (com.equals("NaN"))
-								{
-									result += HEX(addr) + " " + HEX(inst) + "\n";
-								}
-								else
-								{
-									if (isMRI(com))
-									{
-										result += convertToCommand(inst);
-										c = true;
-									}
-									else
-									{
-										result += convertToCommand(inst) + "\n";
-										c = false;
-									}
-								}
+								result += convertToCommand(inst) + "\n";
+								c = false;
 							}
 						}
 
